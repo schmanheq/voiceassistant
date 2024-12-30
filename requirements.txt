@@ -1,0 +1,6 @@
+Packages:
+-requests
+-Speechrecognition
+-pyaudio
+-Homebrew mit portaudio
+- alsa-utils in terminal
