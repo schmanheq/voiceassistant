@@ -4,3 +4,4 @@ Packages:
 -pyaudio
 -Homebrew mit portaudio
 - alsa-utils in terminal
+- seeed-voicecard git repo
