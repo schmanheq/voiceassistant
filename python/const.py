@@ -1,4 +1,4 @@
-from credential import Credentials
+from credentials import Credentials
 
 class Api():
     get_device_url = "https://openapi.api.govee.com/router/api/v1/user/devices"

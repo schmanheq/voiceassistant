@@ -35,7 +35,8 @@ def control_device(sku,device_id,type,instance,value):
         }
     }
     response = requests.post(Api.control_device_url,headers = Api.headers, json=payload)
-    print(response.text)
+    if response.status_code!=200:
+        print(response.text)
 
 
 def toggle(deviceName):
@@ -47,5 +48,3 @@ def toggle(deviceName):
         type = Capabilities.light_switch['type']
         lights_status = get_status(instance,sku,device_id)
         control_device(sku,device_id,type,instance, (lights_status+1)%2)
-
-toggle("Anhs Tisch")
