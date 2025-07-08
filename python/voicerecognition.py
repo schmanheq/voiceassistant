@@ -7,13 +7,17 @@ import signal
 import time
 from credentials import  Credentials
 from myDesk import toggle
+from sonos_control import fetch_sonos_speaker, wake_up, could_not_understand, fetch_curr_state, play_song
 
-# ───── 1  SETUP PORCUPINE AND SPEECHRECOGNITION ──────────────────────────────────────────────────────────────
+# ───── 1  SETUP PORCUPINE, SPEECHRECOGNITION, SONOS SPEAKER ──────────────────────────────────────────────────────────────
 for i,mic in enumerate(sr.Microphone.list_microphone_names()):
+    print(i,mic)
     if mic=='capture':
         MIC_INDEX = i
-    else:
-        exit
+        break
+else:
+    sys.exit(1)
+
         
 porcupine = pvporcupine.create(
     access_key=Credentials.porcupine_key,
@@ -33,10 +37,13 @@ stream = pa.open(
 r = sr.Recognizer()
 mic = sr.Microphone(device_index=MIC_INDEX)
 
-print("Calibrating…")
-with mic as src:                     # one open/close only
+speaker_name = "Bedroom"
+speaker = fetch_sonos_speaker(speaker_name)
+print("Speaker connected")
+
+with mic as src:                     
     r.adjust_for_ambient_noise(src, duration=1)
-print("Done.  Activate with keyword")
+print("Activate with keyword")
 
 # ───── 3  CLEAN EXIT ON CTRL-C ─────────────────────────────────────────────
 def _handle_sigint(sig, frame):
@@ -58,8 +65,9 @@ while True:
 
     if result >= 0:
         print("✓ Wake word detected!")
+        song,artist, position = fetch_curr_state(speaker)
+        wake_up(speaker)
         with mic as source:
-            # Listen for up to 5 seconds
             audio = r.listen(source, timeout=5, phrase_time_limit=5)
         try:
             text = r.recognize_google(audio)
@@ -68,8 +76,9 @@ while True:
             print(text)
         except sr.UnknownValueError:
             print("…couldn’t understand that")
+            could_not_understand(speaker)
         except sr.RequestError as e:
             print("API failure:", e)
-
+        play_song(speaker, artist, song, position)
         print("Waiting for wake word...")
 
