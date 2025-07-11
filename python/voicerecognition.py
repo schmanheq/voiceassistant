@@ -7,11 +7,10 @@ import signal
 import time
 from credentials import  Credentials
 from myDesk import toggle
-from sonos_control import fetch_sonos_speaker, wake_up, could_not_understand, fetch_curr_state, play_song
-
+from sonos_control import fetch_sonos_speaker, jarvis, fetch_curr_state, resume, fetch_queue
+#time.sleep(5)
 # ───── 1  SETUP PORCUPINE, SPEECHRECOGNITION, SONOS SPEAKER ──────────────────────────────────────────────────────────────
 for i,mic in enumerate(sr.Microphone.list_microphone_names()):
-    print(i,mic)
     if mic=='capture':
         MIC_INDEX = i
         break
@@ -39,6 +38,8 @@ mic = sr.Microphone(device_index=MIC_INDEX)
 
 speaker_name = "Bedroom"
 speaker = fetch_sonos_speaker(speaker_name)
+speaker.clear_queue()
+speaker.play_mode = "SHUFFLE"
 print("Speaker connected")
 
 with mic as src:                     
@@ -64,21 +65,20 @@ while True:
     result = porcupine.process(pcm_unpacked)
 
     if result >= 0:
-        print("✓ Wake word detected!")
         song,artist, position = fetch_curr_state(speaker)
-        wake_up(speaker)
+        jarvis(speaker,"welcome back")
         with mic as source:
             audio = r.listen(source, timeout=5, phrase_time_limit=5)
         try:
             text = r.recognize_google(audio)
             if "table" in text:
                 toggle("Anhs Tisch")
-            print(text)
+            else:
+                print(text)
         except sr.UnknownValueError:
-            print("…couldn’t understand that")
-            could_not_understand(speaker)
+            jarvis(speaker, "could not understand")
         except sr.RequestError as e:
             print("API failure:", e)
-        play_song(speaker, artist, song, position)
-        print("Waiting for wake word...")
+        resume(speaker, artist, song, position)
+        time.sleep(5)
 

@@ -15,3 +15,15 @@ class Capabilities:
         'type':'devices.capabilities.on_off',
         'instance':'powerSwitch'
     }
+
+class Phrases:
+    phrases = {
+        'welcome back':{
+            'audio_path':'welcomeback.wav',
+            'audio_length':1.5
+        },
+        'could not understand':{
+            'audio_path':'notunderstand.wav',
+            'audio_length':1.5
+        },
+    }
