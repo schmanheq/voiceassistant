@@ -1,11 +1,14 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from credentials import Credentials
+from spotipy.oauth2 import SpotifyOAuth
+
 
 
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id=Credentials.spotify_client_id,
-    client_secret=Credentials.spotify_client_secret
+    client_secret=Credentials.spotify_client_secret,
+
 ))
 
 
@@ -19,5 +22,6 @@ def search_track_id(track_name, artist_name):
     track = results['tracks']['items'][0]
     track_id= track['id']                
     return track_id
+
 
 

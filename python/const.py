@@ -27,3 +27,9 @@ class Phrases:
             'audio_length':1.5
         },
     }
+    activation_words = {
+        'next':{'skip', 'next'},
+        'previous':{'back','previous', 'last'},
+        'louder':{'louder','up','increase'},
+        'quiter':{'decrease','down', 'lower'},
+    }
