@@ -7,14 +7,11 @@ import signal
 import time
 from credentials import  Credentials
 from myDesk import toggle
-from sonos_control import fetch_sonos_speaker, jarvis, fetch_curr_state, resume, fetch_queue
+from sonos_control import fetch_sonos_speaker, jarvis, fetch_curr_state, resume, fetch_queue, play_playlist
 from const import Phrases
-#ToDo:
-# implement play and pause
-# implement play certain playlist
-# after "not understand the entire thing holds"
 
-#time.sleep(5)
+time.sleep(5)
+
 # ───── 1  SETUP PORCUPINE, SPEECHRECOGNITION, SONOS SPEAKER ──────────────────────────────────────────────────────────────
 for i,mic in enumerate(sr.Microphone.list_microphone_names()):
     if mic=='capture':
@@ -43,7 +40,13 @@ r = sr.Recognizer()
 mic = sr.Microphone(device_index=MIC_INDEX)
 
 speaker_name = "Bedroom"
-speaker = fetch_sonos_speaker(speaker_name)
+speaker = None
+while not speaker:
+    try:
+        speaker=fetch_sonos_speaker(speaker_name)
+        time.sleep(1)
+    except Exception as e:
+        print(e)
 speaker.clear_queue()
 speaker.play_mode = "SHUFFLE"
 print("Speaker connected")
@@ -72,12 +75,12 @@ while True:
 
     if result >= 0:
         song,artist, position, playlist_position = fetch_curr_state(speaker)
-        fetch_queue(speaker)
         jarvis(speaker,"welcome back")
         with mic as source:
-            audio = r.listen(source, timeout=5, phrase_time_limit=5)
+            audio = r.listen(source, timeout=5, phrase_time_limit=7)
         try:
             text = r.recognize_google(audio)
+            print(text)
             if "table" in text:
                 toggle("Anhs Tisch")
                 resume(speaker, artist, song, position,playlist_position)
@@ -98,6 +101,14 @@ while True:
                 speaker.volume-=5
                 print("volume decreased")
                 resume(speaker, artist,song,position,playlist_position)
+
+            elif any(word in text for word in Phrases.activation_words['stop']):
+                speaker.pause()
+                
+            elif any(word in text for word in Phrases.activation_words['resume']):
+                resume(speaker, artist,song,position,playlist_position)
+            elif 'playlist' in text:
+                play_playlist(speaker,text)
             else:
                 print("Nothing. ")
                 resume(speaker, artist,song,position,playlist_position)

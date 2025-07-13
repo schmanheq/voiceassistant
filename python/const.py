@@ -32,4 +32,16 @@ class Phrases:
         'previous':{'back','previous', 'last'},
         'louder':{'louder','up','increase'},
         'quiter':{'decrease','down', 'lower'},
+        'stop':{'stop','pause'},
+        'resume':{'resume','continue'}
     }
+
+    playlist_titles = {
+        'summer':'Summer House 2025',
+        'chill':'lofi beats',
+        'main':'my music universe',
+        'house':'Tempelhof 60',
+        'test':'TestPlaylist'
+    }
+
+    

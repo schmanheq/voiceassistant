@@ -58,6 +58,24 @@ def resume(speaker, artist, song, position, playlist_position):
             speaker.play_from_queue(0)
             print("resume: song ID not found")
 
+def play_playlist(speaker, text):
+    for key in Phrases.playlist_titles:
+        if key in text:
+            playlist_title = Phrases.playlist_titles[key] 
+            break
+    else:
+        print(f"no playlist found for {text}")
+
+    library = soco.music_library.MusicLibrary()
+    favs = library.get_sonos_favorites(complete_result=True)
+    for playlist in favs:
+        if playlist_title == playlist.title:
+            playlist = playlist.reference
+            speaker.clear_queue()
+            speaker.add_to_queue(playlist)
+            speaker.play_from_queue(0)
+            print(f'playing {playlist_title}')
+            return
 
 def fetch_queue(speaker):
     queue = speaker.get_queue(start=0, max_items=10)
